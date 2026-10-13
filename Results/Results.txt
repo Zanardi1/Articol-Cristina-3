@@ -1,0 +1,105 @@
+Rezultate pentru SKLearnClassification: 
+
+Face recognition accuracy: 0.87
+
+                   precision    recall  f1-score   support
+
+     Ariel Sharon       1.00      0.55      0.71        11
+     Colin Powell       0.73      0.94      0.82        47
+  Donald Rumsfeld       1.00      0.73      0.84        22
+    George W Bush       0.88      0.97      0.92       119
+Gerhard Schroeder       0.94      0.84      0.89        19
+      Hugo Chavez       1.00      0.62      0.76        13
+       Tony Blair       0.95      0.70      0.81        27
+
+         accuracy                           0.87       258
+        macro avg       0.93      0.76      0.82       258
+     weighted avg       0.89      0.87      0.86       258
+
+
+-----
+
+Rezultate pentru TensorFlowClassification: 
+
+Face recognition accuracy: 0.97
+
+                   precision    recall  f1-score   support
+
+     Ariel Sharon       0.91      0.91      0.91        11
+     Colin Powell       0.96      0.98      0.97        47
+  Donald Rumsfeld       0.95      0.82      0.88        22
+    George W Bush       0.98      0.99      0.98       119
+Gerhard Schroeder       1.00      0.95      0.97        19
+      Hugo Chavez       1.00      1.00      1.00        13
+       Tony Blair       0.96      1.00      0.98        27
+
+         accuracy                           0.97       258
+        macro avg       0.96      0.95      0.96       258
+     weighted avg       0.97      0.97      0.97       258
+
+
+-----
+
+Rezultate pentru FaceNetTorchClassification: 
+
+Face recognition accuracy: 1.00
+
+                   precision    recall  f1-score   support
+
+     Ariel Sharon       0.92      1.00      0.96        11
+     Colin Powell       1.00      1.00      1.00        47
+  Donald Rumsfeld       1.00      0.95      0.98        22
+    George W Bush       1.00      1.00      1.00       119
+Gerhard Schroeder       1.00      1.00      1.00        19
+      Hugo Chavez       1.00      1.00      1.00        13
+       Tony Blair       1.00      1.00      1.00        27
+
+         accuracy                           1.00       258
+        macro avg       0.99      0.99      0.99       258
+     weighted avg       1.00      1.00      1.00       258
+
+
+-----
+
+Rezultate pentru VGGClassification: 
+
+Face recognition accuracy: 0.99
+
+                   precision    recall  f1-score   support
+
+     Ariel Sharon       1.00      1.00      1.00        16
+     Colin Powell       1.00      1.00      1.00        47
+  Donald Rumsfeld       1.00      0.96      0.98        24
+    George W Bush       1.00      1.00      1.00       106
+Gerhard Schroeder       0.96      1.00      0.98        22
+      Hugo Chavez       1.00      1.00      1.00        14
+       Tony Blair       0.97      0.97      0.97        29
+
+         accuracy                           0.99       258
+        macro avg       0.99      0.99      0.99       258
+     weighted avg       0.99      0.99      0.99       258
+
+
+-----
+
+Rezultate pentru DlibClassification: 
+
+Face recognition accuracy: 1.00
+
+                   precision    recall  f1-score   support
+
+     Ariel Sharon       1.00      1.00      1.00        12
+     Colin Powell       1.00      1.00      1.00        36
+  Donald Rumsfeld       1.00      1.00      1.00        22
+    George W Bush       1.00      1.00      1.00        98
+Gerhard Schroeder       1.00      1.00      1.00        18
+      Hugo Chavez       1.00      1.00      1.00         6
+       Tony Blair       1.00      1.00      1.00        15
+
+         accuracy                           1.00       207
+        macro avg       1.00      1.00      1.00       207
+     weighted avg       1.00      1.00      1.00       207
+
+
+-----
+

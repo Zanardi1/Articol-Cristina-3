@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 
 import matplotlib.pyplot as plt
+import numpy as np
 from sklearn.datasets import fetch_lfw_people
 from sklearn.metrics import classification_report, accuracy_score, ConfusionMatrixDisplay
 from sklearn.model_selection import train_test_split
@@ -25,6 +26,8 @@ class Base:
         self.X_test = []
         self.y_train = []
         self.model = None
+        self.train_indices = None
+        self.test_indices = None
 
     def load_data(self):
         from facenet_torch import FaceNetTorchClassification
@@ -48,9 +51,21 @@ class Base:
         print(f'n_features: {self.n_features}')
         print(f'n_classes: {self.n_classes}')
 
+    def create_shared_split(self):
+        indices = np.arange(self.n_samples)
+        self.train_indices, self.test_indices = train_test_split(
+            indices,
+            test_size=0.2,
+            random_state=42,
+            stratify=self.y
+        )
+        print(f'Shared training samples:{len(self.train_indices)}')
+        print(f'Shared test samples:{len(self.test_indices)}')
+
     def execute(self):
         self.load_data()
         self.print_load_results()
+        self.create_shared_split()
 
     def print_accuracy(self):
         print(f'Face recognition accuracy: {self.accuracy:.2f}')
@@ -90,9 +105,27 @@ class Base:
             print(classification_report(self.y_test, self.y_pred, target_names=self.target_names) + '\n', file=f)
             print('-----\n', file=f)
 
-    def split_data(self, X, y, stratify=None):
-        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(X, y, test_size=0.2, random_state=42,
-                                                                                stratify=stratify)
+    def split_data(self, X, y, stratify=None, original_indices=None):
+        X = np.array(X)
+        y = np.array(y)
+
+        if original_indices is None:
+            if len(X) != self.n_samples or len(y) != self.n_samples:
+                raise ValueError('Filtered data must provide original indices')
+            original_indices = np.arange(self.n_samples)
+        else:
+            original_indices = np.asarray(original_indices)
+
+        if len(X) != len(y) or len(X) != len(original_indices):
+            raise ValueError('X, y and original_indices must have same length.')
+
+        train_mask = np.isin(original_indices, self.train_indices)
+        test_mask = np.isin(original_indices, self.test_indices)
+
+        self.X_train = X[train_mask]
+        self.X_test = X[test_mask]
+        self.y_train = y[train_mask]
+        self.y_test = y[test_mask]
 
     def train_model(self, model):
         from sk import SKLearnClassification

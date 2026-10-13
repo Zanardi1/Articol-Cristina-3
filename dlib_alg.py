@@ -24,6 +24,8 @@ class DlibClassification(Base):
         self.knn = None
         self.image = None
         self.embedding = None
+        self.embedding_indices = []
+        self.failed_indices = []
 
     def download_and_extract(self, filename, url):
         """Download and extract a .bz2 file."""
@@ -76,17 +78,38 @@ class DlibClassification(Base):
         self.recognizer = dlib.face_recognition_model_v1('dlib_face_recognition_resnet_model_v1.dat')
 
     def fill_face_embeddings_and_labels(self):
+        self.face_embeddings = []
+        self.labels = []
+        self.embedding_indices = []
+        self.failed_indices = []
+
         for i in range(self.n_samples):
-            self.image = self.X[i]
-            self.image = cv2.cvtColor(self.image, cv2.COLOR_GRAY2BGR)  # Convert grayscale to BGR (dlib expects color)
+            image = cv2.cvtColor(self.X[i], cv2.COLOR_GRAY2BGR)  # Convert grayscale to BGR (dlib expects color)
+            embedding = self.get_face_embedding(image)
 
-            self.embedding = self.get_face_embedding(self.image)
-            if self.embedding is not None:
-                self.face_embeddings.append(self.embedding)
+            if embedding is not None:
+                self.face_embeddings.append(embedding)
                 self.labels.append(self.y[i])
+                self.embedding_indices.append(i)
+            else:
+                self.failed_indices.append(i)
 
-        self.face_embeddings = np.array(self.face_embeddings)
+        self.face_embeddings = np.asarray(self.face_embeddings)
         self.labels = np.array(self.labels)
+        self.embedding_indices = np.asarray(self.embedding_indices)
+
+        train_failures = np.isin(
+            self.failed_indices, self.train_indices
+        ).sum()
+
+        test_failures = np.isin(
+            self.failed_indices, self.test_indices
+        ).sum()
+
+        print(f'Dlib face detection failures: {len(self.failed_indices)}')
+        print(f'Training set failures: {train_failures}')
+        print(f'Test set failures: {test_failures}')
+        print(f'Test set detection coverage: {(len(self.test_indices) - test_failures) / len(self.test_indices):.2%}')
 
     def encode_targets(self):
         self.encoder = LabelEncoder()
@@ -97,8 +120,7 @@ class DlibClassification(Base):
         self.load_data()
         self.initialize_detectors()
         self.fill_face_embeddings_and_labels()
-        self.encode_targets()
-        self.split_data(X=self.face_embeddings, y=self.y_encoded)
+        self.split_data(X=self.face_embeddings, y=self.labels, original_indices=self.embedding_indices)
         self.train_model(model=KNeighborsClassifier())
         self.evaluate_model()
         self.print_results()

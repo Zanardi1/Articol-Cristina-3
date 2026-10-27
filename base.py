@@ -115,6 +115,7 @@ class Base:
                 print(
                     f'Test set detection coverage: {(len(self.test_indices) - self.test_failures) / len(self.test_indices):.2%}',
                     file=f)
+                print(f'End to end accuracy: {self.end_to_end_accuracy:.2%}', file=f)
             print('-----\n', file=f)
 
     def split_data(self, X, y, stratify=None, original_indices=None):

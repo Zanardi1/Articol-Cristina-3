@@ -97,12 +97,24 @@ class Base:
         self.print_results_to_file()
 
     def print_results_to_file(self):
+        from dlib_alg import DlibClassification
         path = Path('Results')
         path.mkdir(parents=True, exist_ok=True)
         with open(path / 'Results.txt', 'a') as f:
             print(f'Rezultate pentru {self.__class__.__name__}: \n', file=f)
+            print('Total dataset size: \n', file=f)
+            print(f'n_samples: {self.n_samples}', file=f)
+            print(f'n_features: {self.n_features}', file=f)
+            print(f'n_classes: {self.n_classes}', file=f)
             print(f'Face recognition accuracy: {self.accuracy:.2f}\n', file=f)
             print(classification_report(self.y_test, self.y_pred, target_names=self.target_names) + '\n', file=f)
+            if isinstance(self, DlibClassification):
+                print(f'Dlib face detection failures: {len(self.failed_indices)}', file=f)
+                print(f'Training set failures: {self.train_failures}', file=f)
+                print(f'Test set failures: {self.test_failures}', file=f)
+                print(
+                    f'Test set detection coverage: {(len(self.test_indices) - self.test_failures) / len(self.test_indices):.2%}',
+                    file=f)
             print('-----\n', file=f)
 
     def split_data(self, X, y, stratify=None, original_indices=None):

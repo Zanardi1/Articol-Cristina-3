@@ -26,6 +26,8 @@ class DlibClassification(Base):
         self.embedding = None
         self.embedding_indices = []
         self.failed_indices = []
+        self.train_failures = 0
+        self.test_failures = 0
 
     def download_and_extract(self, filename, url):
         """Download and extract a .bz2 file."""
@@ -98,18 +100,19 @@ class DlibClassification(Base):
         self.labels = np.array(self.labels)
         self.embedding_indices = np.asarray(self.embedding_indices)
 
-        train_failures = np.isin(
+        self.train_failures = np.isin(
             self.failed_indices, self.train_indices
         ).sum()
 
-        test_failures = np.isin(
+        self.test_failures = np.isin(
             self.failed_indices, self.test_indices
         ).sum()
 
         print(f'Dlib face detection failures: {len(self.failed_indices)}')
-        print(f'Training set failures: {train_failures}')
-        print(f'Test set failures: {test_failures}')
-        print(f'Test set detection coverage: {(len(self.test_indices) - test_failures) / len(self.test_indices):.2%}')
+        print(f'Training set failures: {self.train_failures}')
+        print(f'Test set failures: {self.test_failures}')
+        print(
+            f'Test set detection coverage: {(len(self.test_indices) - self.test_failures) / len(self.test_indices):.2%}')
 
     def encode_targets(self):
         self.encoder = LabelEncoder()

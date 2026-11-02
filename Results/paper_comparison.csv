@@ -1,0 +1,6 @@
+Algorithm,Accuracy (%),Macro F1 (%),Detection coverage (%),End-to-end accuracy (%)
+SKLearn,86.20 +/- 2.10,83.31 +/- 2.97,N/A,N/A
+FaceNet,99.77 +/- 0.21,99.63 +/- 0.37,N/A,N/A
+VGG-Face,99.61 +/- 0.39,99.44 +/- 0.56,N/A,N/A
+ResNet101,96.28 +/- 0.89,94.94 +/- 1.06,N/A,N/A
+Dlib,100.00 +/- 0.00,100.00 +/- 0.00,92.48 +/- 1.33,92.48 +/- 1.33

@@ -11,6 +11,7 @@ from sklearn.svm import SVC
 from dlib_alg import DlibClassification
 from facenet_torch import FaceNetTorchClassification
 from resnet import TensorFlowClassification
+from sk import SKLearnClassification
 from vgg_deepface import VGGClassification
 
 SEEDS = [42, 123, 2024, 2025, 2026]
@@ -90,6 +91,21 @@ def evaluate_splits(name, features, labels, original_indices=None):
             )
 
         results.append(row)
+
+    return results
+
+
+def run_sklearn():
+    print('\n---Scikit-learn PCA+SVM---')
+
+    model = SKLearnClassification()
+    results = model.evaluate_multiple_splits()
+
+    for row in results:
+        row['algorithm'] = 'SKLearn'
+
+    del model
+    gc.collect()
 
     return results
 
@@ -192,6 +208,7 @@ def main():
     all_results = []
 
     # Run one algorithm at a time.
+    all_results.extend(run_sklearn())
     all_results.extend(run_facenet())
     all_results.extend(run_vgg())
     all_results.extend(run_resnet())
@@ -199,10 +216,26 @@ def main():
 
     df = pd.DataFrame(all_results)
 
+    expected_algorithms = {
+        'SKLearn',
+        'FaceNet',
+        'VGG-Face',
+        'ResNet101',
+        'Dlib'
+    }
+
+    assert set(df['algorithm']) == expected_algorithms
+    assert len(df) == 25
+
     print("\n=== ALL INDIVIDUAL RESULTS ===")
     print(df.to_string(index=False))
 
-    metrics = ["accuracy", "macro_f1", 'coverage', 'end_to_end_accuracy']
+    metrics = [
+        "accuracy",
+        "macro_f1",
+        'coverage',
+        'end_to_end_accuracy'
+    ]
 
     summary = df.groupby("algorithm")[metrics].agg(
         ["mean", "std"]

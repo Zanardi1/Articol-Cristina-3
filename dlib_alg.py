@@ -28,7 +28,7 @@ class DlibClassification(Base):
         self.failed_indices = []
         self.train_failures = 0
         self.test_failures = 0
-        self.end_to_end_accuracy=0.0
+        self.end_to_end_accuracy = 0.0
 
     def download_and_extract(self, filename, url):
         """Download and extract a .bz2 file."""
@@ -45,16 +45,22 @@ class DlibClassification(Base):
             print(f"Downloaded and extracted {filename}.")
 
     def get_face_embedding(self, image):
+        if not hasattr(self, '_pixel_range_checked'):
+            print(
+                f'Dlib input dtype: {image.dtype}, '
+                f'min={image.min()}, max={image.max()}'
+            )
+            self._pixel_range_checked = True
         # Convert float32 to uint8
         image = (image * 255).astype(np.uint8)
 
         # Resize the image to a larger size (e.g., 200x200)
-        image_resized = cv2.resize(image, (200, 200))
+        image_resized = cv2.resize(image, (148, 200), interpolation=cv2.INTER_CUBIC)
 
         # Convert to grayscale
         gray = cv2.cvtColor(image_resized, cv2.COLOR_RGB2GRAY)
 
-        faces = self.detector(gray)
+        faces = self.detector(gray, 0)
 
         if len(faces) == 0:
             return None
@@ -121,15 +127,16 @@ class DlibClassification(Base):
 
     def execute(self):
         super().execute()
-        self.load_data()
         self.initialize_detectors()
         self.fill_face_embeddings_and_labels()
         self.split_data(X=self.face_embeddings, y=self.labels, original_indices=self.embedding_indices)
         self.train_model(model=KNeighborsClassifier())
         self.evaluate_model()
-        successful_test_images=len(self.y_test)
-        total_test_images=len(self.test_indices)
-        self.end_to_end_accuracy=self.accuracy*successful_test_images/total_test_images
+        successful_test_images = len(self.y_test)
+        total_test_images = len(self.test_indices)
+        self.end_to_end_accuracy = (
+                self.accuracy * successful_test_images / total_test_images
+        )
         print(f'Recognition accuracy: {self.accuracy:.2%}')
         print(f'End to end accuracy: {self.end_to_end_accuracy:.2%}')
         self.print_results()

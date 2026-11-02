@@ -51,12 +51,12 @@ class Base:
         print(f'n_features: {self.n_features}')
         print(f'n_classes: {self.n_classes}')
 
-    def create_shared_split(self):
+    def create_shared_split(self,random_state=42):
         indices = np.arange(self.n_samples)
         self.train_indices, self.test_indices = train_test_split(
             indices,
             test_size=0.2,
-            random_state=42,
+            random_state=random_state,
             stratify=self.y
         )
         print(f'Shared training samples:{len(self.train_indices)}')

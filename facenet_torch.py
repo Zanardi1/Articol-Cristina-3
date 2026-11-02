@@ -29,6 +29,12 @@ class FaceNetTorchClassification(Base):
     def process_images(self):
         self.X_processed = self.preprocess_images()
 
+        print('FaceNet preprocessing diagnostics: ')
+        print(f'Shape: {self.X_processed.shape}')
+        print(f'Data type: {self.X_processed.dtype}')
+        print(f'Minimum: {self.X_processed.min().item():.4f}')
+        print(f'Maximum: {self.X_processed.max().item():.4f}')
+
     def load_model(self):
         self.model = InceptionResnetV1(pretrained='vggface2').eval()
 

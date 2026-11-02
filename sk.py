@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from scipy.stats import loguniform
 from sklearn.decomposition import PCA
 from sklearn.metrics import ConfusionMatrixDisplay, classification_report
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, f1_score
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
@@ -59,7 +59,7 @@ class SKLearnClassification(Base):
         self.n_components = 150
         print(f'Extracting top {self.n_components} eigenfaces from {self.X_train.shape[0]} faces')
         t0 = time()
-        self.pca = PCA(n_components=self.n_components, svd_solver='randomized', whiten=True).fit(self.X_train)
+        self.pca = PCA(n_components=self.n_components, svd_solver='randomized', whiten=True,random_state=42).fit(self.X_train)
         print(f'Done in {time() - t0:.3f} s')
         return self.pca
 
@@ -116,6 +116,65 @@ class SKLearnClassification(Base):
         self.transform_data()
         self.train_model(
             model=RandomizedSearchCV(SVC(kernel='rbf', class_weight='balanced'), param_distributions=self.param_grid,
-                                     n_iter=10))
+                                     n_iter=10, random_state=42))
         self.prediction()
         self.print_results()
+
+    def evaluate_multiple_splits(self):
+        import numpy as np
+
+        random_states = [42, 123, 2024, 2025, 2026]
+        results = []
+
+        self.load_data()
+        self.print_load_results()
+
+        for seed in random_states:
+            print(f'\nEvaluating split with random_state={seed}')
+
+            self.create_shared_split(random_state=seed)
+            self.split_data(X=self.X, y=self.y)
+
+            self.scale_data()
+            self.extract_eigenfaces()
+            self.transform_data()
+
+            self.train_model(
+                model=RandomizedSearchCV(
+                    SVC(kernel='rbf', class_weight='balanced'),
+                    param_distributions=self.param_grid,
+                    n_iter=10,
+                    random_state=42
+                )
+            )
+
+            self.prediction()
+
+            macro_f1 = f1_score(
+                self.y_test,
+                self.y_pred,
+                average='macro'
+            )
+
+            results.append({
+                'seed': seed,
+                'accuracy': self.accuracy,
+                'macro_f1': macro_f1
+            })
+
+            print(
+                f'Seed {seed}: '
+                f'accuracy={self.accuracy:.4f}, '
+                f'macro F1={macro_f1:.4f}'
+            )
+
+        accuracies = np.array([r['accuracy'] for r in results])
+        f1_scores = np.array([r['macro_f1'] for r in results])
+
+        print('\n=== FIVE-SPLIT SUMMARY ===')
+        print(f'Mean accuracy: {accuracies.mean():.4f}')
+        print(f'Std accuracy: {accuracies.std(ddof=1):.4f}')
+        print(f'Mean macro F1: {f1_scores.mean():.4f}')
+        print(f'Std macro F1: {f1_scores.std(ddof=1):.4f}')
+
+        return results

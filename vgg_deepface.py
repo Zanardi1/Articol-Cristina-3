@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 from deepface import DeepFace
+from deepface.models.facial_recognition import VGGFace
 from sklearn.preprocessing import LabelEncoder
 from sklearn.svm import SVC
 
@@ -17,10 +18,21 @@ class VGGClassification(Base):
         self.X_test_embedded = []
 
     def preprocess_images(self):
+        # self.X_rgb = np.array([
+        #     cv2.resize(cv2.cvtColor(img.reshape(self.h, self.w), cv2.COLOR_GRAY2RGB), (224, 224))
+        #     for img in self.X
+        # ])
         self.X_rgb = np.array([
             cv2.resize(cv2.cvtColor(img.reshape(self.h, self.w), cv2.COLOR_GRAY2RGB), (224, 224))
             for img in self.X
-        ])
+        ],dtype=np.float32)
+        self.X_rgb*=255.0
+
+        print('VGG-face preprocessing diagnostics: ')
+        print(f'Shape: {self.X_rgb.shape}')
+        print(f'Data type: {self.X_rgb.dtype}')
+        print(f'Minimum: {self.X_rgb.min():.4f}')
+        print(f'Maximum: {self.X_rgb.max():.4f}')
 
     def encode_labels(self):
         encoder = LabelEncoder()
@@ -28,7 +40,8 @@ class VGGClassification(Base):
 
     def extract_embeddings(self, images):
         return np.array([
-            DeepFace.represent(img_path=img, model_name='VGG-Face', enforce_detection=False)[0]['embedding']
+            # DeepFace.represent(img_path=img, model_name='VGG-Face', enforce_detection=False)[0]['embedding']
+            DeepFace.represent(img_path=img, model_name='VGG-Face', enforce_detection=False,normalization='VGGFace')[0]['embedding']
             for img in images
         ])
 

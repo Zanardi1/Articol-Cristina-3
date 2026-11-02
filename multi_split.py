@@ -9,7 +9,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 
 from dlib_alg import DlibClassification
-from experiment_config import SEEDS, EXPECTED_CLASSES, EXPECTED_SAMPLES, TEST_SIZE
+from experiment_config import SEEDS, EXPECTED_CLASSES, EXPECTED_SAMPLES
 from experiment_config import TEST_SIZE
 from facenet_torch import FaceNetTorchClassification
 from resnet import TensorFlowClassification
@@ -58,9 +58,6 @@ def evaluate_splits(name, features, labels, original_indices=None):
         raise ValueError(
             f'{name}: unexpected missing samples'
         )
-
-    if len(features) != len(original_indices):
-        raise ValueError("Features and indices have different lengths.")
 
     results = []
 
@@ -129,9 +126,9 @@ def evaluate_splits(name, features, labels, original_indices=None):
         if name == "Dlib":
             coverage = len(y_test) / len(test_idx)
             end_to_end = accuracy * coverage
-            assert 0<=coverage<=1
-            assert 0<=end_to_end<=coverage
-            assert np.isclose(end_to_end,accuracy*coverage)
+            assert 0 <= coverage <= 1
+            assert 0 <= end_to_end <= coverage
+            assert np.isclose(end_to_end, accuracy * coverage)
 
             row["coverage"] = coverage
             row["end_to_end_accuracy"] = end_to_end
@@ -251,6 +248,11 @@ def run_dlib():
 
     # Detect faces and extract embeddings only once.
     model.fill_face_embeddings_and_labels()
+
+    if not np.array_equal(model.labels,model.y[model.embedding_indices]):
+        raise ValueError(
+            'Dlib embeddings and original labels are misaligned'
+        )
 
     results = evaluate_splits(
         "Dlib",

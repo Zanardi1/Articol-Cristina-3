@@ -1,4 +1,5 @@
 import numpy as np
+from experiment_config import SEEDS
 from scipy.stats import loguniform
 from sklearn.decomposition import PCA
 from sklearn.metrics import f1_score
@@ -11,7 +12,6 @@ from base import Base
 
 
 class SKLearnClassification(Base):
-    SEEDS = [42, 123, 2024, 2025, 2026]
 
     def __init__(self):
         """Initializes the SKLearnClassification object with default values."""
@@ -36,7 +36,7 @@ class SKLearnClassification(Base):
         self.load_data()
         self.print_load_results()
 
-        for seed in self.SEEDS:
+        for seed in SEEDS:
             print(f'\nEvaluating split with random_state={seed}')
 
             self.create_shared_split(random_state=seed)

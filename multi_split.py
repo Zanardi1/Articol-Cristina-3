@@ -9,12 +9,12 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 
 from dlib_alg import DlibClassification
+from experiment_config import SEEDS, EXPECTED_CLASSES, EXPECTED_SAMPLES, TEST_SIZE
+from experiment_config import TEST_SIZE
 from facenet_torch import FaceNetTorchClassification
 from resnet import TensorFlowClassification
 from sk import SKLearnClassification
 from vgg_deepface import VGGClassification
-
-SEEDS = [42, 123, 2024, 2025, 2026]
 
 
 def evaluate_splits(name, features, labels, original_indices=None):
@@ -23,10 +23,41 @@ def evaluate_splits(name, features, labels, original_indices=None):
     labels = np.asarray(labels)
     features = np.asarray(features)
 
+    if len(labels) != EXPECTED_SAMPLES:
+        raise ValueError(
+            f'{name}: unexpected dataset size'
+        )
+
+    if len(np.unique(labels)) != EXPECTED_CLASSES:
+        raise ValueError(
+            f'{name}: unexpected number of classes'
+        )
+
     if original_indices is None:
         original_indices = np.arange(len(labels))
     else:
         original_indices = np.asarray(original_indices)
+
+    if features.ndim != 2:
+        raise ValueError(
+            f'{name}: expected a feature 2D matrix'
+        )
+    if len(features) != len(original_indices):
+        raise ValueError(
+            f'{name}: features and indices have different lengths'
+        )
+    if len(np.unique(original_indices)) != len(original_indices):
+        raise ValueError(
+            f'{name}: duplicate original indices'
+        )
+    if np.any(original_indices < 0) or np.any(original_indices >= len(labels)):
+        raise ValueError(
+            f'{name}: original indices outside dataset bounds'
+        )
+    if name != 'Dlib' and len(original_indices) != len(labels):
+        raise ValueError(
+            f'{name}: unexpected missing samples'
+        )
 
     if len(features) != len(original_indices):
         raise ValueError("Features and indices have different lengths.")
@@ -36,13 +67,39 @@ def evaluate_splits(name, features, labels, original_indices=None):
     for seed in SEEDS:
         train_idx, test_idx = train_test_split(
             np.arange(len(labels)),
-            test_size=0.2,
+            test_size=TEST_SIZE,
             random_state=seed,
             stratify=labels
         )
 
         train_mask = np.isin(original_indices, train_idx)
         test_mask = np.isin(original_indices, test_idx)
+
+        selected_train = original_indices[train_mask]
+        selected_test = original_indices[test_mask]
+
+        if np.intersect1d(selected_train, selected_test).size:
+            raise ValueError(
+                f'{name}: train/test overlap for seed {seed}'
+            )
+        if name != 'Dlib':
+            if not np.array_equal(
+                    np.sort(selected_train), np.sort(train_idx)
+            ):
+                raise ValueError(
+                    f'{name}: training partition mismatch'
+                )
+            if not np.array_equal(
+                    np.sort(selected_test), np.sort(test_idx)
+            ):
+                raise ValueError(
+                    f'{name}: test partition mismatch'
+                )
+        else:
+            if len(selected_train) + len(selected_test) != len(original_indices):
+                raise ValueError(
+                    f'{name}: detected samples missing from split'
+                )
 
         X_train = features[train_mask]
         X_test = features[test_mask]
@@ -72,6 +129,9 @@ def evaluate_splits(name, features, labels, original_indices=None):
         if name == "Dlib":
             coverage = len(y_test) / len(test_idx)
             end_to_end = accuracy * coverage
+            assert 0<=coverage<=1
+            assert 0<=end_to_end<=coverage
+            assert np.isclose(end_to_end,accuracy*coverage)
 
             row["coverage"] = coverage
             row["end_to_end_accuracy"] = end_to_end

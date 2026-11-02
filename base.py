@@ -6,6 +6,7 @@ import numpy as np
 from sklearn.datasets import fetch_lfw_people
 from sklearn.metrics import classification_report, accuracy_score, ConfusionMatrixDisplay
 from sklearn.model_selection import train_test_split
+from experiment_config import TEST_SIZE,MIN_FACES_PER_PERSON,IMAGE_RESIZE,EXPECTED_SAMPLES,EXPECTED_CLASSES
 
 
 class Base:
@@ -32,8 +33,8 @@ class Base:
     def load_data(self,image_format='flat'):
         lfw_people = fetch_lfw_people(
             data_home=os.getcwd(),
-            min_faces_per_person=70,
-            resize=0.4
+            min_faces_per_person=MIN_FACES_PER_PERSON,
+            resize=IMAGE_RESIZE
         )
         self.n_samples, self.h, self.w = lfw_people.images.shape
 
@@ -50,6 +51,16 @@ class Base:
         self.y = lfw_people.target
         self.target_names = lfw_people.target_names
         self.n_classes = len(self.target_names)
+        if self.n_samples!=EXPECTED_SAMPLES:
+            raise ValueError(
+                f'Expected {EXPECTED_SAMPLES} samples, '
+                f'found {self.n_samples}'
+            )
+        if self.n_classes!=EXPECTED_CLASSES:
+            raise ValueError(
+                f'Expected {EXPECTED_CLASSES} classes, '
+                f'found {self.n_classes}'
+            )
 
     def print_load_results(self):
         print('Total dataset size: ')
@@ -61,7 +72,7 @@ class Base:
         indices = np.arange(self.n_samples)
         self.train_indices, self.test_indices = train_test_split(
             indices,
-            test_size=0.2,
+            test_size=TEST_SIZE,
             random_state=random_state,
             stratify=self.y
         )

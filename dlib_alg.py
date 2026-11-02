@@ -132,9 +132,9 @@ class DlibClassification(Base):
             print(f'Detection failures: {len(self.failed_indices)}',file=f)
             print(f'Training failures: {self.train_failures}',file=f)
             print(f'Test failures: {self.test_failures}',file=f)
-            coverage=(len(self.test_indices) - self.train_failures) / len(self.test_indices)
+            coverage=(len(self.test_indices) - self.test_failures) / len(self.test_indices)
             print(f'Test set coverage: {coverage:.2%}',file=f)
-            print(f'End-to-end accuracy: {self.end_to_end_accuracy:.f%}',file=f)
+            print(f'End-to-end accuracy: {self.end_to_end_accuracy:.2%}',file=f)
             print('-----\n',file=f)
 
     def execute(self):

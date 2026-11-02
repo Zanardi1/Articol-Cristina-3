@@ -18,14 +18,11 @@ from base import Base
 
 
 class SKLearnClassification(Base):
+    SEEDS = [42, 123, 2024, 2025, 2026]
 
     def __init__(self):
         """Initializes the SKLearnClassification object with default values."""
         super().__init__()
-        self.pca = None
-        self.eigenfaces = None
-        self.X_train_pca = None
-        self.X_test_pca = None
         self.n_components = 150
         self.param_grid = {
             'C': loguniform(1e3, 1e5),
@@ -111,34 +108,33 @@ class SKLearnClassification(Base):
     def execute(self):
         super().execute()
         self.split_data(X=self.X, y=self.y)
-        self.scale_data()
-        self.extract_eigenfaces()
-        self.reshape_components()
-        self.transform_data()
-        self.train_model(
-            model=RandomizedSearchCV(SVC(kernel='rbf', class_weight='balanced'), param_distributions=self.param_grid,
-                                     n_iter=10, random_state=42))
-        self.prediction()
+        self.train_model(self.build_search_pipeline())
+        self.evaluate_model()
+        print(f'Best parameters: {self.model.best_params_}')
         self.print_results()
 
     def evaluate_multiple_splits(self):
-        random_states = [42, 123, 2024, 2025, 2026]
         results = []
 
         self.load_data()
         self.print_load_results()
 
-        for seed in random_states:
+        for seed in self.SEEDS:
             print(f'\nEvaluating split with random_state={seed}')
 
             self.create_shared_split(random_state=seed)
             self.split_data(X=self.X, y=self.y)
 
-            self.model = self.build_search_pipeline()
-            self.model.fit(self.X_train, self.y_train)
-            self.y_pred = self.model.predict(self.X_test)
-            self.accuracy = accuracy_score(self.y_test, self.y_pred)
-            macro_f1 = f1_score(self.y_test, self.y_pred, average='macro', zero_division=0)
+            self.train_model(self.build_search_pipeline())
+            self.evaluate_model()
+
+            macro_f1 = f1_score(
+                self.y_test,
+                self.y_pred,
+                average='macro',
+                zero_division=0
+            )
+
             results.append({
                 'seed': seed,
                 'accuracy': self.accuracy,
@@ -148,11 +144,10 @@ class SKLearnClassification(Base):
             print(f'Seed: {seed}\n')
             print(f'Accuracy: {self.accuracy:.4f}\n')
             print(f'Macro F1: {macro_f1:.4f}\n')
-
             print(f'Best parameters: {self.model.best_params_}')
 
-        accuracies = np.array([r['accuracy'] for r in results])
-        f1_scores = np.array([r['macro_f1'] for r in results])
+        accuracies = np.array([result['accuracy'] for result in results])
+        f1_scores = np.array([result['macro_f1'] for result in results])
 
         print('\n=== FIVE-SPLIT SUMMARY ===')
         print(f'Mean accuracy: {accuracies.mean():.4f}')
@@ -166,7 +161,7 @@ class SKLearnClassification(Base):
         pipeline = Pipeline([
             ('scaler', StandardScaler()),
             ('pca', PCA(
-                n_components=150,
+                n_components=self.n_components,
                 svd_solver='randomized',
                 whiten=True,
                 random_state=42

@@ -49,6 +49,8 @@ class VGGClassification(Base):
         self.encode_labels()
         self.split_data(X=self.X_rgb, y=self.y_encoded, stratify=self.y_encoded)
         self.get_embeddings()
+        self.X_train=self.X_train_embedded
+        self.X_test=self.X_test_embedded
         self.train_model(model=SVC(kernel='linear', probability=True))
         self.evaluate_model()
         self.print_results()

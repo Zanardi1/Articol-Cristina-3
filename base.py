@@ -29,21 +29,27 @@ class Base:
         self.train_indices = None
         self.test_indices = None
 
-    def load_data(self):
-        from facenet_torch import FaceNetTorchClassification
-        from dlib_alg import DlibClassification
-
-        lfw_people = fetch_lfw_people(data_home=os.getcwd(), min_faces_per_person=70, resize=0.4)
+    def load_data(self,image_format='flat'):
+        lfw_people = fetch_lfw_people(
+            data_home=os.getcwd(),
+            min_faces_per_person=70,
+            resize=0.4
+        )
         self.n_samples, self.h, self.w = lfw_people.images.shape
-        if isinstance(self, FaceNetTorchClassification) or isinstance(self, DlibClassification):
-            self.X = lfw_people.images
+
+        if image_format=='images':
+            self.X=lfw_people.images
+        elif image_format=='flat':
+            self.X=lfw_people.data
         else:
-            self.X = lfw_people.data
+            raise ValueError(
+                f'Unsupported image format: {image_format}'
+            )
         self.n_features = self.X.shape[1]
 
         self.y = lfw_people.target
         self.target_names = lfw_people.target_names
-        self.n_classes = self.target_names.shape[0]
+        self.n_classes = len(self.target_names)
 
     def print_load_results(self):
         print('Total dataset size: ')
@@ -74,21 +80,19 @@ class Base:
         print(classification_report(self.y_test, self.y_pred, target_names=self.target_names))
 
     def print_confusion_matrix(self):
-        from sk import SKLearnClassification
-
-        if isinstance(self, SKLearnClassification):
-            X = self.X_test_pca
-        else:
-            X = self.X_test
-
-        ConfusionMatrixDisplay.from_estimator(self.model, X, self.y_test,
-                                              display_labels=self.target_names,
-                                              xticks_rotation='vertical')
-        plt.tight_layout()
-        # plt.show()
         path = Path('Results')
         path.mkdir(parents=True, exist_ok=True)
+
+        ConfusionMatrixDisplay.from_estimator(
+            self.model,
+            self.X_test,
+            self.y_test,
+            display_labels=self.target_names,
+            xticks_rotation='vertical',
+        )
+        plt.tight_layout()
         plt.savefig(path / (str(self.__class__.__name__) + '.png'), format='png')
+        plt.close()
 
     def print_results(self):
         self.print_accuracy()
@@ -97,25 +101,17 @@ class Base:
         self.print_results_to_file()
 
     def print_results_to_file(self):
-        from dlib_alg import DlibClassification
         path = Path('Results')
         path.mkdir(parents=True, exist_ok=True)
-        with open(path / 'Results.txt', 'a') as f:
+
+        with open(path / 'Results.txt', 'a',encoding='utf-8') as f:
             print(f'Rezultate pentru {self.__class__.__name__}: \n', file=f)
             print('Total dataset size: \n', file=f)
-            print(f'n_samples: {self.n_samples}', file=f)
-            print(f'n_features: {self.n_features}', file=f)
-            print(f'n_classes: {self.n_classes}', file=f)
-            print(f'Face recognition accuracy: {self.accuracy:.2f}\n', file=f)
-            print(classification_report(self.y_test, self.y_pred, target_names=self.target_names) + '\n', file=f)
-            if isinstance(self, DlibClassification):
-                print(f'Dlib face detection failures: {len(self.failed_indices)}', file=f)
-                print(f'Training set failures: {self.train_failures}', file=f)
-                print(f'Test set failures: {self.test_failures}', file=f)
-                print(
-                    f'Test set detection coverage: {(len(self.test_indices) - self.test_failures) / len(self.test_indices):.2%}',
-                    file=f)
-                print(f'End to end accuracy: {self.end_to_end_accuracy:.2%}', file=f)
+            print(f'Samples: {self.n_samples}', file=f)
+            print(f'Features: {self.n_features}', file=f)
+            print(f'Classes: {self.n_classes}', file=f)
+            print(f'Accuracy: {self.accuracy:.2f}\n', file=f)
+            print(classification_report(self.y_test, self.y_pred, target_names=self.target_names), file=f)
             print('-----\n', file=f)
 
     def split_data(self, X, y, stratify=None, original_indices=None):
@@ -141,30 +137,9 @@ class Base:
         self.y_test = y[test_mask]
 
     def train_model(self, model):
-        from sk import SKLearnClassification
-        from resnet import TensorFlowClassification
-        from vgg_deepface import VGGClassification
-
-        if isinstance(self, SKLearnClassification):
-            self.X_train = self.X_train_pca
-
-        if isinstance(self, TensorFlowClassification):
-            self.X_train = self.X_train_features
-
-        if isinstance(self, VGGClassification):
-            self.X_train = self.X_train_embedded
-
         self.model = model
         self.model.fit(self.X_train, self.y_train)
 
     def evaluate_model(self):
-        from resnet import TensorFlowClassification
-        from vgg_deepface import VGGClassification
-
-        if isinstance(self, TensorFlowClassification):
-            self.X_test = self.X_test_features
-        elif isinstance(self, VGGClassification):
-            self.X_test = self.X_test_embedded
-
         self.y_pred = self.model.predict(self.X_test)
         self.accuracy = accuracy_score(self.y_test, self.y_pred)

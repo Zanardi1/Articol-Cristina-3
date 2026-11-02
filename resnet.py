@@ -56,6 +56,8 @@ class TensorFlowClassification(Base):
         self.define_model()
         self.get_features()
         self.reshape_features()
+        self.X_train = self.X_train_features
+        self.X_test = self.X_test_features
         self.train_model(model=SVC(kernel='linear', probability=True))
         self.evaluate_model()
         self.print_results()

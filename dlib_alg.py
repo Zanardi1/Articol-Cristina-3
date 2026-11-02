@@ -7,6 +7,7 @@ import dlib
 import numpy as np
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import LabelEncoder
+from pathlib import Path
 
 from base import Base
 
@@ -72,7 +73,7 @@ class DlibClassification(Base):
         return None
 
     def load_data(self):
-        super().load_data()
+        super().load_data(image_format='images')
 
         self.download_and_extract("shape_predictor_68_face_landmarks.dat",
                                   "http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2")
@@ -91,7 +92,7 @@ class DlibClassification(Base):
         self.failed_indices = []
 
         for i in range(self.n_samples):
-            image = cv2.cvtColor(self.X[i], cv2.COLOR_GRAY2RGB)  # Convert grayscale to BGR (dlib expects color)
+            image = cv2.cvtColor(self.X[i], cv2.COLOR_GRAY2RGB)
             embedding = self.get_face_embedding(image)
 
             if embedding is not None:
@@ -122,6 +123,19 @@ class DlibClassification(Base):
     def encode_targets(self):
         self.encoder = LabelEncoder()
         self.y_encoded = self.encoder.fit_transform(self.labels)
+
+    def print_results_to_file(self):
+        super().print_results_to_file()
+
+        path=Path('Results')
+        with open(path/'Results.txt','a',encoding='utf-8') as f:
+            print(f'Detection failures: {len(self.failed_indices)}',file=f)
+            print(f'Training failures: {self.train_failures}',file=f)
+            print(f'Test failures: {self.test_failures}',file=f)
+            coverage=(len(self.test_indices) - self.train_failures) / len(self.test_indices)
+            print(f'Test set coverage: {coverage:.2%}',file=f)
+            print(f'End-to-end accuracy: {self.end_to_end_accuracy:.f%}',file=f)
+            print('-----\n',file=f)
 
     def execute(self):
         super().execute()

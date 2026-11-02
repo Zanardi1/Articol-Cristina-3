@@ -45,6 +45,9 @@ class FaceNetTorchClassification(Base):
     def get_embeddings(self):
         self.X_embeddings = self.extract_embeddings(self.X_processed)
 
+    def load_data(self):
+        super().load_data(image_format='images')
+
     def execute(self):
         super().execute()
         self.process_images()

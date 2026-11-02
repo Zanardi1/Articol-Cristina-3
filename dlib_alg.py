@@ -21,8 +21,6 @@ class DlibClassification(Base):
         self.face_embeddings = []
         self.labels = []
         self.encoder = None
-        self.knn = None
-        self.image = None
         self.embedding = None
         self.embedding_indices = []
         self.failed_indices = []
@@ -54,7 +52,7 @@ class DlibClassification(Base):
         # Convert float32 to uint8
         image = (image * 255).astype(np.uint8)
 
-        # Resize the image to a larger size (e.g., 200x200)
+        # Preserve the LFW aspect ratio while enlarging the image.
         image_resized = cv2.resize(image, (148, 200), interpolation=cv2.INTER_CUBIC)
 
         # Convert to grayscale

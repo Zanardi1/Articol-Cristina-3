@@ -4,17 +4,17 @@ from pathlib import Path
 from time import time
 
 import matplotlib.pyplot as plt
+import numpy as np
 from scipy.stats import loguniform
 from sklearn.decomposition import PCA
 from sklearn.metrics import ConfusionMatrixDisplay, classification_report
 from sklearn.metrics import accuracy_score, f1_score
 from sklearn.model_selection import RandomizedSearchCV
+from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 
 from base import Base
-from sklearn.pipeline import Pipeline
-
 
 
 class SKLearnClassification(Base):
@@ -22,13 +22,11 @@ class SKLearnClassification(Base):
     def __init__(self):
         """Initializes the SKLearnClassification object with default values."""
         super().__init__()
-        self.y_pred = None
         self.pca = None
         self.eigenfaces = None
         self.X_train_pca = None
         self.X_test_pca = None
         self.n_components = 150
-        self.clf = None
         self.param_grid = {
             'C': loguniform(1e3, 1e5),
             'gamma': loguniform(1e-4, 1e-1)
@@ -61,7 +59,8 @@ class SKLearnClassification(Base):
         self.n_components = 150
         print(f'Extracting top {self.n_components} eigenfaces from {self.X_train.shape[0]} faces')
         t0 = time()
-        self.pca = PCA(n_components=self.n_components, svd_solver='randomized', whiten=True,random_state=42).fit(self.X_train)
+        self.pca = PCA(n_components=self.n_components, svd_solver='randomized', whiten=True, random_state=42).fit(
+            self.X_train)
         print(f'Done in {time() - t0:.3f} s')
         return self.pca
 
@@ -123,8 +122,6 @@ class SKLearnClassification(Base):
         self.print_results()
 
     def evaluate_multiple_splits(self):
-        import numpy as np
-
         random_states = [42, 123, 2024, 2025, 2026]
         results = []
 
@@ -137,15 +134,15 @@ class SKLearnClassification(Base):
             self.create_shared_split(random_state=seed)
             self.split_data(X=self.X, y=self.y)
 
-            self.model=self.build_search_pipeline()
-            self.model.fit(self.X_train,self.y_train)
-            self.y_pred=self.model.predict(self.X_test)
-            self.accuracy=accuracy_score(self.y_test,self.y_pred)
-            macro_f1=f1_score(self.y_test,self.y_pred,average='macro',zero_division=0)
+            self.model = self.build_search_pipeline()
+            self.model.fit(self.X_train, self.y_train)
+            self.y_pred = self.model.predict(self.X_test)
+            self.accuracy = accuracy_score(self.y_test, self.y_pred)
+            macro_f1 = f1_score(self.y_test, self.y_pred, average='macro', zero_division=0)
             results.append({
-                'seed':seed,
-                'accuracy':self.accuracy,
-                'macro_f1':macro_f1
+                'seed': seed,
+                'accuracy': self.accuracy,
+                'macro_f1': macro_f1
             })
 
             print(f'Seed: {seed}\n')
@@ -153,39 +150,6 @@ class SKLearnClassification(Base):
             print(f'Macro F1: {macro_f1:.4f}\n')
 
             print(f'Best parameters: {self.model.best_params_}')
-
-            # self.scale_data()
-            # self.extract_eigenfaces()
-            # self.transform_data()
-            #
-            # self.train_model(
-            #     model=RandomizedSearchCV(
-            #         SVC(kernel='rbf', class_weight='balanced'),
-            #         param_distributions=self.param_grid,
-            #         n_iter=10,
-            #         random_state=42
-            #     )
-            # )
-            #
-            # self.prediction()
-            #
-            # macro_f1 = f1_score(
-            #     self.y_test,
-            #     self.y_pred,
-            #     average='macro'
-            # )
-            #
-            # results.append({
-            #     'seed': seed,
-            #     'accuracy': self.accuracy,
-            #     'macro_f1': macro_f1
-            # })
-            #
-            # print(
-            #     f'Seed {seed}: '
-            #     f'accuracy={self.accuracy:.4f}, '
-            #     f'macro F1={macro_f1:.4f}'
-            # )
 
         accuracies = np.array([r['accuracy'] for r in results])
         f1_scores = np.array([r['macro_f1'] for r in results])
@@ -199,15 +163,15 @@ class SKLearnClassification(Base):
         return results
 
     def build_search_pipeline(self):
-        pipeline=Pipeline([
+        pipeline = Pipeline([
             ('scaler', StandardScaler()),
-            ('pca',PCA(
+            ('pca', PCA(
                 n_components=150,
                 svd_solver='randomized',
                 whiten=True,
                 random_state=42
             )),
-            ('svc',SVC(
+            ('svc', SVC(
                 kernel='rbf',
                 class_weight='balanced',
             ))
@@ -216,8 +180,8 @@ class SKLearnClassification(Base):
         return RandomizedSearchCV(
             estimator=pipeline,
             param_distributions={
-                'svc__C':self.param_grid['C'],
-                'svc__gamma':self.param_grid['gamma'],
+                'svc__C': self.param_grid['C'],
+                'svc__gamma': self.param_grid['gamma'],
             },
             n_iter=10,
             cv=5,

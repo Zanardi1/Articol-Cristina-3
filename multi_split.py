@@ -1,9 +1,8 @@
-
 import gc
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
-
 from sklearn.metrics import accuracy_score, f1_score
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
@@ -13,7 +12,6 @@ from dlib_alg import DlibClassification
 from facenet_torch import FaceNetTorchClassification
 from resnet import TensorFlowClassification
 from vgg_deepface import VGGClassification
-
 
 SEEDS = [42, 123, 2024, 2025, 2026]
 
@@ -191,52 +189,43 @@ def run_dlib():
 
 
 def main():
-    results = run_dlib()
-    print(results)
+    all_results = []
 
-# def main():
-#     all_results = []
-#
-#     # Run one algorithm at a time.
-#     all_results.extend(run_facenet())
-#     all_results.extend(run_vgg())
-#     all_results.extend(run_resnet())
-#     all_results.extend(run_dlib())
-#
-#     df = pd.DataFrame(all_results)
-#
-#     print("\n=== ALL INDIVIDUAL RESULTS ===")
-#     print(df.to_string(index=False))
-#
-#     print("\n=== FIVE-SPLIT SUMMARY ===")
-#
-#     metrics = ["accuracy", "macro_f1"]
-#
-#     if "coverage" in df.columns:
-#         metrics.extend(["coverage", "end_to_end_accuracy"])
-#
-#     summary = df.groupby("algorithm")[metrics].agg(
-#         ["mean", "std"]
-#     )
-#
-#     print(summary.to_string())
-#
-#     # Preserve exact numerical results for the paper.
-#     from pathlib import Path
-#
-#     output_dir = Path("Results")
-#     output_dir.mkdir(parents=True, exist_ok=True)
-#
-#     df.to_csv(
-#         output_dir / "multi_split_results.csv",
-#         index=False
-#     )
-#
-#     summary.to_csv(
-#         output_dir / "multi_split_summary.csv"
-#     )
-#
-#     print("\nResults saved in the Results directory.")
+    # Run one algorithm at a time.
+    all_results.extend(run_facenet())
+    all_results.extend(run_vgg())
+    all_results.extend(run_resnet())
+    all_results.extend(run_dlib())
+
+    df = pd.DataFrame(all_results)
+
+    print("\n=== ALL INDIVIDUAL RESULTS ===")
+    print(df.to_string(index=False))
+
+    metrics = ["accuracy", "macro_f1", 'coverage', 'end_to_end_accuracy']
+
+    summary = df.groupby("algorithm")[metrics].agg(
+        ["mean", "std"]
+    )
+
+    print("\n=== FIVE-SPLIT SUMMARY ===")
+    print(summary.to_string())
+
+    # Preserve exact numerical results for the paper.
+
+    output_dir = Path("Results")
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    df.to_csv(
+        output_dir / "multi_split_results.csv",
+        index=False
+    )
+
+    summary.to_csv(
+        output_dir / "multi_split_summary.csv"
+    )
+
+    print("\nResults saved in the Results directory.")
 
 
 if __name__ == "__main__":

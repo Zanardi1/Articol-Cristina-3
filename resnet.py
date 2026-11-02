@@ -16,10 +16,8 @@ class TensorFlowClassification(Base):
         """Initializes the TensorFlowClassification class with default attributes."""
         super().__init__()
         self.X_resized = []
-        self.model = None
         self.X_train_features = []
         self.X_test_features = []
-        self.clf = []
 
     def preprocess_images(self, target_size=(224, 224)):
         images_resized = []

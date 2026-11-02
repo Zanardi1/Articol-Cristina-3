@@ -11,9 +11,7 @@ class FaceNetTorchClassification(Base):
         super().__init__()
         self.processed_images = []
         self.X_processed = []
-        self.model = None
         self.X_embeddings = None
-        self.classifier = None
 
     def preprocess_images(self):
         transform = transforms.Compose([

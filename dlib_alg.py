@@ -93,7 +93,7 @@ class DlibClassification(Base):
         self.failed_indices = []
 
         for i in range(self.n_samples):
-            image = cv2.cvtColor(self.X[i], cv2.COLOR_GRAY2BGR)  # Convert grayscale to BGR (dlib expects color)
+            image = cv2.cvtColor(self.X[i], cv2.COLOR_GRAY2RGB)  # Convert grayscale to BGR (dlib expects color)
             embedding = self.get_face_embedding(image)
 
             if embedding is not None:

@@ -13,6 +13,8 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 
 from base import Base
+from sklearn.pipeline import Pipeline
+
 
 
 class SKLearnClassification(Base):
@@ -135,38 +137,55 @@ class SKLearnClassification(Base):
             self.create_shared_split(random_state=seed)
             self.split_data(X=self.X, y=self.y)
 
-            self.scale_data()
-            self.extract_eigenfaces()
-            self.transform_data()
-
-            self.train_model(
-                model=RandomizedSearchCV(
-                    SVC(kernel='rbf', class_weight='balanced'),
-                    param_distributions=self.param_grid,
-                    n_iter=10,
-                    random_state=42
-                )
-            )
-
-            self.prediction()
-
-            macro_f1 = f1_score(
-                self.y_test,
-                self.y_pred,
-                average='macro'
-            )
-
+            self.model=self.build_search_pipeline()
+            self.model.fit(self.X_train,self.y_train)
+            self.y_pred=self.model.predict(self.X_test)
+            self.accuracy=accuracy_score(self.y_test,self.y_pred)
+            macro_f1=f1_score(self.y_test,self.y_pred,average='macro',zero_division=0)
             results.append({
-                'seed': seed,
-                'accuracy': self.accuracy,
-                'macro_f1': macro_f1
+                'seed':seed,
+                'accuracy':self.accuracy,
+                'macro_f1':macro_f1
             })
 
-            print(
-                f'Seed {seed}: '
-                f'accuracy={self.accuracy:.4f}, '
-                f'macro F1={macro_f1:.4f}'
-            )
+            print(f'Seed: {seed}\n')
+            print(f'Accuracy: {self.accuracy:.4f}\n')
+            print(f'Macro F1: {macro_f1:.4f}\n')
+
+            print(f'Best parameters: {self.model.best_params_}')
+
+            # self.scale_data()
+            # self.extract_eigenfaces()
+            # self.transform_data()
+            #
+            # self.train_model(
+            #     model=RandomizedSearchCV(
+            #         SVC(kernel='rbf', class_weight='balanced'),
+            #         param_distributions=self.param_grid,
+            #         n_iter=10,
+            #         random_state=42
+            #     )
+            # )
+            #
+            # self.prediction()
+            #
+            # macro_f1 = f1_score(
+            #     self.y_test,
+            #     self.y_pred,
+            #     average='macro'
+            # )
+            #
+            # results.append({
+            #     'seed': seed,
+            #     'accuracy': self.accuracy,
+            #     'macro_f1': macro_f1
+            # })
+            #
+            # print(
+            #     f'Seed {seed}: '
+            #     f'accuracy={self.accuracy:.4f}, '
+            #     f'macro F1={macro_f1:.4f}'
+            # )
 
         accuracies = np.array([r['accuracy'] for r in results])
         f1_scores = np.array([r['macro_f1'] for r in results])
@@ -178,3 +197,30 @@ class SKLearnClassification(Base):
         print(f'Std macro F1: {f1_scores.std(ddof=1):.4f}')
 
         return results
+
+    def build_search_pipeline(self):
+        pipeline=Pipeline([
+            ('scaler', StandardScaler()),
+            ('pca',PCA(
+                n_components=150,
+                svd_solver='randomized',
+                whiten=True,
+                random_state=42
+            )),
+            ('svc',SVC(
+                kernel='rbf',
+                class_weight='balanced',
+            ))
+        ])
+
+        return RandomizedSearchCV(
+            estimator=pipeline,
+            param_distributions={
+                'svc__C':self.param_grid['C'],
+                'svc__gamma':self.param_grid['gamma'],
+            },
+            n_iter=10,
+            cv=5,
+            random_state=42,
+            n_jobs=-1
+        )

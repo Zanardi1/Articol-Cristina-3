@@ -191,48 +191,52 @@ def run_dlib():
 
 
 def main():
-    all_results = []
+    results = run_dlib()
+    print(results)
 
-    # Run one algorithm at a time.
-    all_results.extend(run_facenet())
-    all_results.extend(run_vgg())
-    all_results.extend(run_resnet())
-    all_results.extend(run_dlib())
-
-    df = pd.DataFrame(all_results)
-
-    print("\n=== ALL INDIVIDUAL RESULTS ===")
-    print(df.to_string(index=False))
-
-    print("\n=== FIVE-SPLIT SUMMARY ===")
-
-    metrics = ["accuracy", "macro_f1"]
-
-    if "coverage" in df.columns:
-        metrics.extend(["coverage", "end_to_end_accuracy"])
-
-    summary = df.groupby("algorithm")[metrics].agg(
-        ["mean", "std"]
-    )
-
-    print(summary.to_string())
-
-    # Preserve exact numerical results for the paper.
-    from pathlib import Path
-
-    output_dir = Path("Results")
-    output_dir.mkdir(parents=True, exist_ok=True)
-
-    df.to_csv(
-        output_dir / "multi_split_results.csv",
-        index=False
-    )
-
-    summary.to_csv(
-        output_dir / "multi_split_summary.csv"
-    )
-
-    print("\nResults saved in the Results directory.")
+# def main():
+#     all_results = []
+#
+#     # Run one algorithm at a time.
+#     all_results.extend(run_facenet())
+#     all_results.extend(run_vgg())
+#     all_results.extend(run_resnet())
+#     all_results.extend(run_dlib())
+#
+#     df = pd.DataFrame(all_results)
+#
+#     print("\n=== ALL INDIVIDUAL RESULTS ===")
+#     print(df.to_string(index=False))
+#
+#     print("\n=== FIVE-SPLIT SUMMARY ===")
+#
+#     metrics = ["accuracy", "macro_f1"]
+#
+#     if "coverage" in df.columns:
+#         metrics.extend(["coverage", "end_to_end_accuracy"])
+#
+#     summary = df.groupby("algorithm")[metrics].agg(
+#         ["mean", "std"]
+#     )
+#
+#     print(summary.to_string())
+#
+#     # Preserve exact numerical results for the paper.
+#     from pathlib import Path
+#
+#     output_dir = Path("Results")
+#     output_dir.mkdir(parents=True, exist_ok=True)
+#
+#     df.to_csv(
+#         output_dir / "multi_split_results.csv",
+#         index=False
+#     )
+#
+#     summary.to_csv(
+#         output_dir / "multi_split_summary.csv"
+#     )
+#
+#     print("\nResults saved in the Results directory.")
 
 
 if __name__ == "__main__":

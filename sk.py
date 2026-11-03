@@ -1,5 +1,4 @@
 import numpy as np
-from experiment_config import SEEDS
 from scipy.stats import loguniform
 from sklearn.decomposition import PCA
 from sklearn.metrics import f1_score
@@ -7,9 +6,10 @@ from sklearn.model_selection import RandomizedSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
-from evaluation_reporting import record_evaluation
 
 from base import Base
+from evaluation_reporting import record_evaluation
+from experiment_config import SEEDS
 
 
 class SKLearnClassification(Base):
@@ -59,7 +59,7 @@ class SKLearnClassification(Base):
                 y_true=self.y_test,
                 y_pred=self.y_pred,
                 target_names=self.target_names,
-                test_indices=self.test_indices
+                test_indices=np.sort(self.test_indices)
             )
 
             results.append({

@@ -32,6 +32,9 @@ def record_evaluation(
     else:
         detected_indices = np.asarray(detected_indices)
 
+    if not (len(y_true) == len(y_pred) == len(detected_indices)):
+        raise ValueError(f"{algorithm}: prediction/index length mismatch")
+
     if len(np.unique(detected_indices)) != len(detected_indices):
         raise ValueError("Duplicate detected indices")
 

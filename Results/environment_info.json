@@ -1,0 +1,23 @@
+{
+    "timestamp_utc": "2026-11-03T10:17:25.058717+00:00",
+    "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+    "python_executable": "C:\\Users\\alexz\\OneDrive\\Uni stuff\\Articole\\Articol Cristina 3\\Python\\.venv\\Scripts\\python.exe",
+    "operating_system": "Windows-11-10.0.26300-SP0",
+    "processor": "Intel64 Family 6 Model 142 Stepping 10, GenuineIntel",
+    "cpu_count": 8,
+    "packages": {
+        "numpy": "2.4.3",
+        "scipy": "1.17.1",
+        "pandas": "3.0.1",
+        "scikit-learn": "1.8.0",
+        "tensorflow": "2.21.0",
+        "keras": "3.13.2",
+        "torch": "2.10.0",
+        "torchvision": "0.25.0",
+        "facenet-pytorch": "2.6.0",
+        "deepface": "0.0.99",
+        "dlib": "20.0.0",
+        "opencv-python": "4.13.0.92",
+        "matplotlib": "3.10.8"
+    }
+}

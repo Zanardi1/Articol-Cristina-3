@@ -1,0 +1,35 @@
+{
+    "FaceNet": [
+        {
+            "filename": "20180402-114759-vggface2.pt",
+            "size_bytes": 111898327,
+            "sha256": "281cebca8662831adb987a874bdcb36e73f5b1c6dc5ee5878f305e985625d99b"
+        }
+    ],
+    "VGG-Face": [
+        {
+            "filename": "vgg_face_weights.h5",
+            "size_bytes": 580085408,
+            "sha256": "759266b9614d0fd5d65b97bf716818b746cc77ab5944c7bffc937c6ba9455d8c"
+        }
+    ],
+    "ResNet101": [
+        {
+            "filename": "resnet101_weights_tf_dim_ordering_tf_kernels_notop.h5",
+            "size_bytes": 171446536,
+            "sha256": "cdc523741a63847eba322946f0c075c66feff48b3f987439ea5867e345ce8b27"
+        }
+    ],
+    "Dlib": [
+        {
+            "filename": "dlib_face_recognition_resnet_model_v1.dat",
+            "size_bytes": 22466066,
+            "sha256": "55533b28a95800a551ba546ba62fe69625c7e95a7061c338adffead08719da30"
+        },
+        {
+            "filename": "shape_predictor_68_face_landmarks.dat",
+            "size_bytes": 99693937,
+            "sha256": "fbdc2cb80eb9aa7a758672cbfdda32ba6300efe9b6e6c7a299ff7e736b11b92f"
+        }
+    ]
+}

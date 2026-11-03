@@ -1,0 +1,15 @@
+## Discussion
+
+The experimental results demonstrate substantial differences in classification performance among the five evaluated facial-recognition pipelines on the selected Labeled Faces in the Wild (LFW) subset. All evaluations were conducted using five shared stratified holdout partitions, each containing 1,030 training images and 258 test images from seven identities.
+
+The Scikit-learn PCA–SVM baseline achieved a mean classification accuracy of 86.20% and a macro F1 score of 83.31%. In comparison, the pretrained feature-extraction pipelines achieved higher classification accuracy. FaceNet obtained 99.77% accuracy and 99.63% macro F1, while VGG-Face achieved 99.61% accuracy and 99.44% macro F1. ResNet101, initialized with ImageNet-pretrained weights, achieved 96.28% accuracy and 94.94% macro F1.
+
+These findings indicate that pretrained feature representations were highly effective for the evaluated closed-set classification task. However, the observed performance differences should not be attributed exclusively to neural-network architecture, as the pipelines also differ in pretraining datasets, image preprocessing, feature extraction, and classifier configuration.
+
+The Dlib pipeline achieved 100% recognition accuracy and macro F1 across all five partitions when evaluated exclusively on images for which face detection succeeded. However, its mean detection coverage was 92.48%, resulting in an end-to-end accuracy of 92.48% when detection failures were counted as unsuccessful recognition attempts. This distinction illustrates the importance of evaluating detection coverage alongside conditional classification accuracy.
+
+The VGG-Face pipeline employed DeepFace with face-detection enforcement disabled. A separate audit identified failures of the default OpenCV detector on the evaluated images, with fallback processing allowing feature extraction to continue. Consequently, its reported classification accuracy reflects the implemented fallback-enabled pipeline rather than successful face detection followed by recognition.
+
+Several limitations constrain the interpretation of these results. First, the selected LFW subset contains only seven identities, making the task considerably narrower than large-scale face recognition. Second, the five holdout partitions overlap and therefore do not constitute independent test datasets. Third, possible overlap between the external face-specific pretraining datasets and LFW has not been independently excluded. Finally, the experiment does not evaluate unknown-identity rejection, cross-dataset generalization, or real-world deployment conditions.
+
+Within these limitations, the results support the effectiveness of pretrained facial representations combined with relatively simple classifiers for restricted closed-set identity classification. They also demonstrate that detection failures and preprocessing policies can materially affect the interpretation of complete facial-recognition pipeline performance.

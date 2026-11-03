@@ -1,0 +1,9 @@
+## Conclusion
+
+This study compared five facial-recognition classification pipelines on a seven-identity subset of the Labeled Faces in the Wild dataset using five shared stratified train/test partitions.
+
+FaceNet and VGG-Face achieved mean classification accuracies exceeding 99%, while ResNet101 achieved approximately 96% and the PCA–SVM baseline approximately 86%. Dlib achieved perfect conditional recognition accuracy on successfully detected faces, but its end-to-end accuracy decreased to approximately 92.5% after accounting for detection failures.
+
+The findings highlight the effectiveness of pretrained feature representations for restricted closed-set facial classification and demonstrate the importance of distinguishing recognition accuracy from detection coverage. The results should be interpreted as a comparison of the implemented pipelines under the specified experimental conditions, rather than a universal ranking of facial-recognition architectures.
+
+Future work may investigate larger identity sets, independent evaluation datasets, alternative detection policies, and the influence of pretrained training-data overlap on classification performance.

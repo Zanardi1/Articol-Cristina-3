@@ -1,0 +1,12 @@
+{
+    "seed": 42,
+    "input_max_abs_difference": 0.00390625,
+    "input_mean_abs_difference": 0.0010610618628561497,
+    "embedding_max_abs_difference": 0.0011105705052614212,
+    "embedding_mean_abs_difference": 6.524483615066856e-05,
+    "current_accuracy": 0.9961240310077519,
+    "reference_accuracy": 0.9961240310077519,
+    "current_macro_f1": 0.9926314819931841,
+    "reference_macro_f1": 0.9926314819931841,
+    "changed_predictions": 0
+}

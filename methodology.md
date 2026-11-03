@@ -121,6 +121,8 @@ The extracted embeddings are classified using a linear-kernel SVM with probabili
 
 The pretrained VGG-Face model is not fine-tuned on the LFW dataset.
 
+The DeepFace implementation uses the default OpenCV face detector with alignment enabled and `enforce_detection=False`. A separate detection audit found that the OpenCV detector did not successfully detect faces in the evaluated LFW images under the enforced-detection configuration. Consequently, the implemented VGG-Face pipeline relies on DeepFace's fallback behavior, which allows the supplied images to be processed when detection fails. The reported VGG-Face classification accuracy therefore reflects identity classification with detection fallback enabled, rather than successful face detection followed by recognition.
+
 ### 4.4 ResNet101 + SVM
 
 The ResNet101 pipeline uses the Keras implementation of ResNet101 with ImageNet-pretrained weights.

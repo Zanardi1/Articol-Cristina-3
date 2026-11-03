@@ -120,7 +120,7 @@ Dlib's recognition accuracy is conditional on successful face detection. Its end
 
 See [methodology.md](methodology.md) for the detailed experimental methodology.
 
-See [REPRODUCIBILITY.md](REPRODUCIBILITY.md) for software environment details, pretrained model dependencies, and reproducibility limitations.
+See [reproducibility.md](reproducibility.md) for software environment details, pretrained model dependencies, and reproducibility limitations.
 
 ## Scope and Limitations
 

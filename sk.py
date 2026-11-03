@@ -7,6 +7,7 @@ from sklearn.model_selection import RandomizedSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
+from evaluation_reporting import record_evaluation
 
 from base import Base
 
@@ -50,6 +51,15 @@ class SKLearnClassification(Base):
                 self.y_pred,
                 average='macro',
                 zero_division=0
+            )
+
+            record_evaluation(
+                algorithm='SKLearn',
+                seed=seed,
+                y_true=self.y_test,
+                y_pred=self.y_pred,
+                target_names=self.target_names,
+                test_indices=self.test_indices
             )
 
             results.append({

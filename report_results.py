@@ -71,7 +71,7 @@ def main():
         dlib['end_to_end_accuracy'],
         dlib['accuracy']*dlib['coverage'],
     ):
-        raise ValueError('Inconsistend Dlib end-to-end accuracy')
+        raise ValueError('Inconsistent Dlib end-to-end accuracy')
 
     metrics=[
         'accuracy',

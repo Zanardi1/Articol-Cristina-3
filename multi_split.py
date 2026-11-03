@@ -9,6 +9,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 
 from dlib_alg import DlibClassification
+from evaluation_reporting import record_evaluation, save_reports
 from experiment_config import SEEDS, EXPECTED_CLASSES, EXPECTED_SAMPLES
 from experiment_config import TEST_SIZE
 from facenet_torch import FaceNetTorchClassification
@@ -17,7 +18,7 @@ from sk import SKLearnClassification
 from vgg_deepface import VGGClassification
 
 
-def evaluate_splits(name, features, labels, original_indices=None):
+def evaluate_splits(name, features, labels, target_names, original_indices=None):
     """Evaluate fixed embeddings using five stratified holdout splits."""
 
     labels = np.asarray(labels)
@@ -116,6 +117,16 @@ def evaluate_splits(name, features, labels, original_indices=None):
             y_test, predictions, average="macro", zero_division=0
         )
 
+        record_evaluation(
+            algorithm=name,
+            seed=seed,
+            y_true=y_test,
+            y_pred=predictions,
+            target_names=target_names,
+            test_indices=test_idx,
+            detected_indices=selected_test
+        )
+
         row = {
             "algorithm": name,
             "seed": seed,
@@ -179,7 +190,8 @@ def run_facenet():
     results = evaluate_splits(
         "FaceNet",
         model.X_embeddings,
-        model.y
+        model.y,
+        model.target_names
     )
 
     del model
@@ -202,7 +214,8 @@ def run_vgg():
     results = evaluate_splits(
         "VGG-Face",
         embeddings,
-        model.y_encoded
+        model.y_encoded,
+        model.target_names
     )
 
     del embeddings, model
@@ -230,7 +243,8 @@ def run_resnet():
     results = evaluate_splits(
         "ResNet101",
         features,
-        model.y
+        model.y,
+        model.target_names
     )
 
     del features, model
@@ -249,7 +263,7 @@ def run_dlib():
     # Detect faces and extract embeddings only once.
     model.fill_face_embeddings_and_labels()
 
-    if not np.array_equal(model.labels,model.y[model.embedding_indices]):
+    if not np.array_equal(model.labels, model.y[model.embedding_indices]):
         raise ValueError(
             'Dlib embeddings and original labels are misaligned'
         )
@@ -258,6 +272,7 @@ def run_dlib():
         "Dlib",
         model.face_embeddings,
         model.y,
+        model.target_names,
         original_indices=model.embedding_indices
     )
 
@@ -319,6 +334,8 @@ def main():
     summary.to_csv(
         output_dir / "multi_split_summary.csv"
     )
+
+    save_reports()
 
     print("\nResults saved in the Results directory.")
 

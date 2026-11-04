@@ -87,8 +87,6 @@ Input size: 160 × 160
 
 Feature extraction is performed on the CPU.
 
-The exact downloaded checkpoint checksum has not been recorded.
-
 ### VGG-Face
 
 Library: `deepface`

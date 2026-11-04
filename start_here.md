@@ -164,6 +164,35 @@ The saved results represent the completed experimental work.
 
 Do not overwrite them casually.
 
+## Command-line launcher
+
+The repository includes `project.py`, a lightweight command-line interface for common operations.
+
+Start with:
+
+```bash
+python project.py help
+```
+
+Useful commands:
+
+| Command | Purpose |
+|---|---|
+| `python project.py info` | Display project information and workflow |
+| `python project.py results` | Inspect saved result-file availability |
+| `python project.py report` | Regenerate the publication comparison table |
+| `python project.py audit --list` | List available scientific audits |
+| `python project.py audit evaluation` | Verify saved predictions and metrics |
+| `python project.py run` | Run the complete experiment after explicit confirmation |
+
+The launcher delegates to the existing Python scripts. It does not replace their implementations.
+
+The full experiment can overwrite saved results. Some audits also write their own JSON outputs or load pretrained models.
+
+The historical `repair_predictions.py` utility is intentionally excluded from the launcher.
+
+For detailed workflow explanations, consult the other sections of this document.
+
 ## 7. Common operations
 
 ### A. Inspect the existing results

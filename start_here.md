@@ -302,7 +302,7 @@ Check the dependency versions before assuming that an algorithm has become incor
 
 When returning to the repository:
 
-1. `START_HERE.md` — Recover the workflow.
+1. `start_here.md` — Recover the workflow.
 2. `readme.md` — Review setup and execution.
 3. `methodology.md` — Recover the scientific reasoning.
 4. `reproducibility.md` — Review environment and known limitations.

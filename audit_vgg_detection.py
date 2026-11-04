@@ -1,8 +1,17 @@
+"""Audit DeepFace face detection on preprocessed LFW images.
+
+Tests the configured OpenCV detector with enforcement enabled.
+Records detection successes, fallback cases, and unexpected errors.
+
+Output: Results/vgg_detection_audit.json
+Run: python audit_vgg_detection.py
+
+This is a diagnostic experiment, not the main classifier evaluation.
+"""
 
 import json
 from pathlib import Path
 
-import numpy as np
 from deepface import DeepFace
 
 from vgg_deepface import VGGClassification

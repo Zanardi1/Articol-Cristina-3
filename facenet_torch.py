@@ -1,3 +1,15 @@
+"""FaceNet feature extraction using pretrained InceptionResnetV1.
+
+Loads VGGFace2-pretrained weights through facenet-pytorch.
+Converts LFW grayscale images into three-channel 160x160 tensors,
+normalizes them, and extracts embeddings on the CPU.
+
+The main experiment uses these fixed embeddings with a linear SVM.
+No LFW fine-tuning of the pretrained network is performed.
+
+See audit_facenet_normalization.py for the preprocessing audit.
+"""
+
 import torch
 from facenet_pytorch import InceptionResnetV1
 from sklearn.svm import SVC

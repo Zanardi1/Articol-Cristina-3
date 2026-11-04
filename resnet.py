@@ -1,3 +1,13 @@
+"""ResNet101 feature extraction for LFW identity classification.
+
+Uses ImageNet-pretrained Keras ResNet101 without its classification head.
+Resizes and preprocesses LFW images, extracts convolutional feature maps,
+and flattens them into feature vectors.
+
+The main experiment trains a linear SVM on the fixed features.
+No LFW fine-tuning of ResNet101 is performed.
+"""
+
 # pylint: disable=import-error, invalid-name, no-member
 
 import numpy as np

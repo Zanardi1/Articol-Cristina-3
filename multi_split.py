@@ -1,3 +1,18 @@
+"""Orchestrate the five facial-recognition pipelines and shared evaluations.
+
+Runs SKLearn, FaceNet, VGG-Face, ResNet101, and Dlib in sequence.
+Uses the shared experiment configuration and records metrics for five
+stratified train/test partitions.
+
+Pretrained feature extractors are not fine-tuned on LFW.
+Dlib detection failures are tracked separately from recognition accuracy.
+
+Outputs include per-split results, summaries, prediction records,
+class-level metrics, and confusion matrices in Results/.
+
+Called by main.py. Running this module directly also executes the experiment.
+"""
+
 import gc
 from pathlib import Path
 

@@ -1,3 +1,14 @@
+"""Generate prediction-level and class-level evaluation reports.
+
+record_evaluation() records labels, predictions, original test indices,
+detection status, per-class metrics, and confusion matrices.
+
+save_reports() writes predictions.csv and class_metrics.csv.
+
+The module maintains in-memory accumulators during an experiment.
+It is used by multi_split.py and the SKLearn evaluation code.
+"""
+
 from pathlib import Path
 
 import matplotlib.pyplot as plt

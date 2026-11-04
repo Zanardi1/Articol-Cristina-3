@@ -1,3 +1,15 @@
+"""Audit FaceNet input normalization and its effect on classification.
+
+Compares the implemented normalization with a reference convention,
+including input differences, embedding differences, and predictions.
+
+Uses the seed-42 train/test partition.
+Output: Results/facenet_normalization_audit.json
+
+Run: python audit_facenet_normalization.py
+Loads the pretrained FaceNet model and performs feature extraction.
+"""
+
 import json
 from pathlib import Path
 

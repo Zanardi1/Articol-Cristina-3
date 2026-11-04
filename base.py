@@ -1,3 +1,12 @@
+"""Shared functionality for the facial-recognition implementations.
+
+Provides LFW loading, dataset validation, stratified train/test splitting,
+classifier training, evaluation, and legacy reporting helpers.
+
+Algorithm-specific classes inherit from Base.
+The main five-split experiment is orchestrated separately by multi_split.py.
+"""
+
 import os
 from pathlib import Path
 
@@ -6,7 +15,8 @@ import numpy as np
 from sklearn.datasets import fetch_lfw_people
 from sklearn.metrics import classification_report, accuracy_score, ConfusionMatrixDisplay
 from sklearn.model_selection import train_test_split
-from experiment_config import TEST_SIZE,MIN_FACES_PER_PERSON,IMAGE_RESIZE,EXPECTED_SAMPLES,EXPECTED_CLASSES
+
+from experiment_config import TEST_SIZE, MIN_FACES_PER_PERSON, IMAGE_RESIZE, EXPECTED_SAMPLES, EXPECTED_CLASSES
 
 
 class Base:
@@ -30,7 +40,7 @@ class Base:
         self.train_indices = None
         self.test_indices = None
 
-    def load_data(self,image_format='flat'):
+    def load_data(self, image_format='flat'):
         lfw_people = fetch_lfw_people(
             data_home=os.getcwd(),
             min_faces_per_person=MIN_FACES_PER_PERSON,
@@ -38,10 +48,10 @@ class Base:
         )
         self.n_samples, self.h, self.w = lfw_people.images.shape
 
-        if image_format=='images':
-            self.X=lfw_people.images
-        elif image_format=='flat':
-            self.X=lfw_people.data
+        if image_format == 'images':
+            self.X = lfw_people.images
+        elif image_format == 'flat':
+            self.X = lfw_people.data
         else:
             raise ValueError(
                 f'Unsupported image format: {image_format}'
@@ -51,12 +61,12 @@ class Base:
         self.y = lfw_people.target
         self.target_names = lfw_people.target_names
         self.n_classes = len(self.target_names)
-        if self.n_samples!=EXPECTED_SAMPLES:
+        if self.n_samples != EXPECTED_SAMPLES:
             raise ValueError(
                 f'Expected {EXPECTED_SAMPLES} samples, '
                 f'found {self.n_samples}'
             )
-        if self.n_classes!=EXPECTED_CLASSES:
+        if self.n_classes != EXPECTED_CLASSES:
             raise ValueError(
                 f'Expected {EXPECTED_CLASSES} classes, '
                 f'found {self.n_classes}'
@@ -68,7 +78,7 @@ class Base:
         print(f'n_features: {self.n_features}')
         print(f'n_classes: {self.n_classes}')
 
-    def create_shared_split(self,random_state=42):
+    def create_shared_split(self, random_state=42):
         indices = np.arange(self.n_samples)
         self.train_indices, self.test_indices = train_test_split(
             indices,
@@ -115,7 +125,7 @@ class Base:
         path = Path('Results')
         path.mkdir(parents=True, exist_ok=True)
 
-        with open(path / 'Results.txt', 'a',encoding='utf-8') as f:
+        with open(path / 'Results.txt', 'a', encoding='utf-8') as f:
             print(f'Rezultate pentru {self.__class__.__name__}: \n', file=f)
             print('Total dataset size: \n', file=f)
             print(f'Samples: {self.n_samples}', file=f)

@@ -1,3 +1,15 @@
+"""Inventory pretrained model checkpoints used by the experiment.
+
+Loads the FaceNet, VGG-Face, and ResNet101 pretrained models, searches
+their checkpoint locations, and records file sizes and SHA-256 hashes.
+Also inventories the Dlib model files in the working directory.
+
+Output: Results/pretrained_model_audit.json
+Run: python audit_pretrained_models.py
+
+May download model weights if they are not already cached.
+"""
+
 import hashlib
 import json
 from pathlib import Path

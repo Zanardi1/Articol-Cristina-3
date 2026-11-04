@@ -1,13 +1,27 @@
+"""Dlib face detection and descriptor extraction for LFW.
+
+Uses Dlib's frontal-face detector, 68-point landmark predictor, and
+pretrained face-recognition descriptor model.
+
+Records original dataset indices for successfully detected faces.
+The main experiment classifies descriptors using KNN.
+
+Recognition accuracy is conditional on successful detection.
+Detection coverage and end-to-end accuracy are reported separately.
+
+Required Dlib model files may be downloaded if absent.
+"""
+
 import bz2
 import os
 import urllib.request
+from pathlib import Path
 
 import cv2
 import dlib
 import numpy as np
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import LabelEncoder
-from pathlib import Path
 
 from base import Base
 
@@ -127,15 +141,15 @@ class DlibClassification(Base):
     def print_results_to_file(self):
         super().print_results_to_file()
 
-        path=Path('Results')
-        with open(path/'Results.txt','a',encoding='utf-8') as f:
-            print(f'Detection failures: {len(self.failed_indices)}',file=f)
-            print(f'Training failures: {self.train_failures}',file=f)
-            print(f'Test failures: {self.test_failures}',file=f)
-            coverage=(len(self.test_indices) - self.test_failures) / len(self.test_indices)
-            print(f'Test set coverage: {coverage:.2%}',file=f)
-            print(f'End-to-end accuracy: {self.end_to_end_accuracy:.2%}',file=f)
-            print('-----\n',file=f)
+        path = Path('Results')
+        with open(path / 'Results.txt', 'a', encoding='utf-8') as f:
+            print(f'Detection failures: {len(self.failed_indices)}', file=f)
+            print(f'Training failures: {self.train_failures}', file=f)
+            print(f'Test failures: {self.test_failures}', file=f)
+            coverage = (len(self.test_indices) - self.test_failures) / len(self.test_indices)
+            print(f'Test set coverage: {coverage:.2%}', file=f)
+            print(f'End-to-end accuracy: {self.end_to_end_accuracy:.2%}', file=f)
+            print('-----\n', file=f)
 
     def execute(self):
         super().execute()

@@ -1,3 +1,14 @@
+"""Independently verify saved train/test predictions and metrics.
+
+Inputs: Results/predictions.csv and Results/multi_split_results.csv
+Also loads the configured LFW dataset.
+
+Checks original image indices, shared test partitions, true labels,
+accuracy, macro F1, and Dlib detection/end-to-end metrics.
+
+Run: python audit_evaluation_consistency.py
+Does not retrain any recognition models.
+"""
 
 from pathlib import Path
 
@@ -55,7 +66,7 @@ def main():
             rows = predictions[
                 (predictions["seed"] == seed) &
                 (predictions["algorithm"] == algorithm)
-            ]
+                ]
 
             assert len(rows) == len(test_idx), (
                 algorithm, seed, "row count"
@@ -70,11 +81,11 @@ def main():
 
             detected = rows[
                 rows["status"] == "detected"
-            ]
+                ]
 
             failed = rows[
                 rows["status"] == "detection failed"
-            ]
+                ]
 
             if algorithm != "Dlib":
                 assert len(failed) == 0
@@ -106,7 +117,7 @@ def main():
             summary = results[
                 (results["seed"] == seed) &
                 (results["algorithm"] == algorithm)
-            ]
+                ]
 
             assert len(summary) == 1
 

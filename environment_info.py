@@ -1,3 +1,15 @@
+"""Record the current Python execution environment.
+
+Collects the operating system, Python version, CPU information,
+and selected installed package versions.
+
+Run: python environment_info.py
+Output: Results/environment_info.json
+
+This records the environment at execution time, not necessarily
+the environment used to produce the original experimental results.
+"""
+
 import json
 import os
 import platform

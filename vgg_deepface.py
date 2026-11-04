@@ -1,3 +1,15 @@
+"""VGG-Face embedding extraction through the DeepFace library.
+
+Converts LFW images into three-channel 224x224 images and extracts
+pretrained VGG-Face embeddings using VGGFace normalization.
+
+DeepFace is called with enforce_detection=False. When its configured
+face detector fails, fallback processing permits feature extraction.
+
+The main experiment classifies the embeddings using a linear SVM.
+See audit_vgg_detection.py for the detector audit.
+"""
+
 import cv2
 import numpy as np
 from deepface import DeepFace
@@ -49,8 +61,8 @@ class VGGClassification(Base):
         self.encode_labels()
         self.split_data(X=self.X_rgb, y=self.y_encoded, stratify=self.y_encoded)
         self.get_embeddings()
-        self.X_train=self.X_train_embedded
-        self.X_test=self.X_test_embedded
+        self.X_train = self.X_train_embedded
+        self.X_test = self.X_test_embedded
         self.train_model(model=SVC(kernel='linear', probability=True))
         self.evaluate_model()
         self.print_results()

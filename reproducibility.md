@@ -133,7 +133,7 @@ The model files are obtained from the Dlib model distribution when not already a
 
 The implementation uses detection upsampling 0, 68-point facial landmarks, aligned face chips, and pretrained face descriptors.
 
-The exact model-file checksums have not been independently documented in this reproducibility record.
+SHA-256 hashes and file sizes for the FaceNet, VGG-Face, ResNet101, and Dlib pretrained model files were recorded during the November 2026 checkpoint audit. See Results/pretrained_model_audit.json. These hashes identify the locally inspected files; they do not independently establish the contents of the original pretraining datasets.
 
 ## 6. Classifier Configurations
 
@@ -201,18 +201,24 @@ python environment_info.py
 
 This records the currently installed package versions and system information.
 
-## 9. Outstanding Reproducibility Questions
+## 9. Completed Audits and Outstanding Reproducibility Questions
 
-The following items remain unresolved:
+### Completed audits
 
-1. Verify the compatibility of FaceNet input normalization with the pretrained checkpoint's expected input range.
-2. Record exact pretrained checkpoint hashes and download provenance.
-3. Record the exact dataset archive or processed-dataset checksum.
-4. Determine whether the face-specific pretrained models have training-data overlap with LFW.
-5. Record the hardware and relevant execution-backend details if computational benchmarking is introduced.
-6. Evaluate portability of the pinned dependency environment on a clean installation.
+1. **FaceNet normalization:** Compared the implemented input normalization with a reference convention. Small input and embedding differences were observed, but the audited seed-42 classification predictions were unchanged. See `Results/facenet_normalization_audit.json`.
+2. **VGG-Face detection:** Audited the configured OpenCV detector and documented fallback behavior. See `Results/vgg_detection_audit.json`.
+3. **Pretrained checkpoint inventory:** Recorded local model-file sizes and SHA-256 hashes. See `Results/pretrained_model_audit.json`.
+4. **Evaluation consistency:** Verified the saved predictions, shared test partitions, label alignment, and reported metrics for all 25 algorithm/seed evaluations. See `audit_evaluation_consistency.py`.
 
-These items should be resolved or explicitly acknowledged before making strong claims about reproducibility or generalization.
+### Outstanding questions
+
+1. Determine whether the face-specific pretrained models' training datasets overlap with the evaluated LFW identities or images. This investigation was deliberately deferred.
+2. Record an exact checksum of the LFW dataset archive or processed dataset.
+3. Establish the original download provenance of the pretrained model files beyond their locally recorded hashes.
+4. Record additional hardware and execution-backend details if computational benchmarking becomes part of the study.
+5. Verify portability of the dependency environment through a clean installation on another machine.
+
+These limitations should be acknowledged when making strong claims about reproducibility or generalization.
 
 ## 10. Interpretation
 

@@ -1,5 +1,14 @@
+"""Diagnose DeepFace detection behavior on selected LFW images.
+
+Tests enforcement-enabled and fallback-enabled detection on a small
+selection of preprocessed images and prints diagnostic information.
+
+Run: python audit_vgg_detection_debug.py
+Does not write the main experimental results.
+"""
 
 from deepface import DeepFace
+
 from vgg_deepface import VGGClassification
 
 model = VGGClassification()

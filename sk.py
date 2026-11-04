@@ -1,3 +1,15 @@
+"""Scikit-learn PCA and SVM baseline for LFW identity classification.
+
+Uses StandardScaler, whitened PCA with 150 components, and an RBF SVM.
+RandomizedSearchCV selects SVM hyperparameters using cross-validation
+within each training partition.
+
+The scaler and PCA are fitted inside the cross-validation pipeline,
+avoiding train/test preprocessing leakage.
+
+Provides the five-split evaluation called by multi_split.py.
+"""
+
 import numpy as np
 from scipy.stats import loguniform
 from sklearn.decomposition import PCA
